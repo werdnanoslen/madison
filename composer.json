@@ -10,15 +10,16 @@
         }
     ],
     "require": {
-        "laravel/framework": "4.1.25",
+        "laravel/framework": "4.2.*",
         "artdarek/oauth-4-laravel": "~1.0",
         "caouecs/laravel4-lang": "0.12.*",
         "doctrine/dbal": "2.5.*",
         "elasticsearch/elasticsearch": "~0.4",
-        "graham-campbell/markdown": "1.0.0",
-        "illuminate/remote": "4.1.25",
-        "illuminate/support": "4.1.25",
+        "graham-campbell/markdown": "2.1.*",
+        "illuminate/remote": "4.2.*",
+        "illuminate/support": "4.2.*",
         "laravelbook/ardent": "~2.4",
+        "lucadegasperi/oauth2-server-laravel": "3.*",
         "roumen/sitemap": "2.4.*",
         "roumen/feed": "2.8.*",
         "zizaco/entrust": "1.2.*"

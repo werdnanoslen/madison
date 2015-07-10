@@ -67,6 +67,8 @@ return array(
 
     'key' => 'YourSecretKey!!!',
 
+    'cipher' => MCRYPT_RIJNDAEL_256,
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
@@ -111,6 +113,8 @@ return array(
         'Zizaco\Entrust\EntrustServiceProvider',
         'Artdarek\OAuth\OAuthServiceProvider',
         'Madison\Services\ServiceProviders\SessionRejectServiceProvider',
+        'LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider',
+        'LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider',
     ),
 
     /*
@@ -138,7 +142,7 @@ return array(
     */
 
     'aliases' => array(
-
+        'Authorizer'      => 'LucaDegasperi\OAuth2Server\Facades\AuthorizerFacade',
         'App'             => 'Illuminate\Support\Facades\App',
         'Artisan'         => 'Illuminate\Support\Facades\Artisan',
         'Auth'            => 'Illuminate\Support\Facades\Auth',

@@ -200,6 +200,10 @@ Route::controller('dashboard', 'DashboardController');
     Route::post('api/user/signup', 'UserManageApiController@postSignup');
 
 //Auth Token Route
-Route::get('/auth/token', 'AuthController@token');
-Route::get('/api/user/login', 'AuthController@login');
-Route::get('/api/user/logout', 'AuthController@logout');
+Route::get('auth/token', 'AuthController@token');
+Route::get('api/user/login', 'AuthController@login');
+Route::get('api/user/logout', 'AuthController@logout');
+
+Route::post('api/oauth/access_token', 'OAuthController@postAccessToken');
+Route::get('api/oauth/authorize', 'OAuthController@getAuthorize');
+Route::post('api/oauth/authorize', 'OAuthController@postAuthorize');
