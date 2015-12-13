@@ -1,6 +1,11 @@
 angular.module('madisonApp.controllers')
-  .controller('DashboardDocumentsController', ['$scope', '$http', '$filter', 'growl', '$state',
-    function ($scope, $http, $filter, growl, $state) {
+  .controller('DashboardDocumentsController', ['$scope', '$http', '$filter',
+    'growl', 'growlMessages', '$state', '$translate', 'pageService', 'SITE',
+    function ($scope, $http, $filter, growl, growlMessages, $state, $translate,
+      pageService, SITE) {
+      pageService.setTitle($translate.instant('content.admindocument.title',
+        {title: SITE.name}));
+
       $scope.docs = [];
       $scope.categories = [];
       $scope.sponsors = [];
@@ -10,11 +15,12 @@ angular.module('madisonApp.controllers')
       $scope.select2 = '';
       $scope.docSort = "created_at";
       $scope.reverse = true;
+      $scope.newDoc = {};
 
       $scope.select2Config = {
         multiple: true,
         allowClear: true,
-        placeholder: "Filter documents by category, sponsor, or status"
+        placeholder: $translate.instant('content.admindocument.searchfilter')
       };
 
       $scope.dateSortConfig = {
@@ -32,19 +38,22 @@ angular.module('madisonApp.controllers')
         });
 
       $scope.createDocument = function () {
-        var title = $scope.newDocTitle;
+        growlMessages.destroyAllMessages();
+
+        var title = $scope.newDoc.title;
 
         if (!title || !title.trim()) {
-          growl.error('You must enter a document title to create a new document.');
+          growl.error($translate.instant('form.admindocument.title.error'));
         }
-
-        $http.post('/api/docs', {title: title})
-          .success(function (data) {
-            $state.go('edit-doc', {id: data.id});
-          })
-          .error(function () {
-            $scope.newDocTitle = null;
-          });
+        else {
+          $http.post('/api/docs', {title: title})
+            .success(function (data) {
+              $state.go('edit-doc', {id: data.doc.id});
+            })
+            .error(function () {
+              $scope.newDoc.title = null;
+            });
+        }
       };
 
       $scope.parseDocs = function (docs) {

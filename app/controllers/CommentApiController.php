@@ -57,11 +57,10 @@ class CommentApiController extends ApiController
         $newComment->text = $comment['text'];
         $newComment->save();
 
-        Event::fire(MadisonEvent::DOC_COMMENTED, $newComment);
+        // Late load the user.
+        $newComment->user;
 
-        $return = Comment::loadComments($newComment->doc_id, $newComment->id, $newComment->user_id);
-
-        return Response::json($return);
+        return Response::json($newComment->toArray());
     }
 
     public function postSeen($docId, $commentId)
@@ -110,20 +109,6 @@ class CommentApiController extends ApiController
         $comment->type = 'comment';
 
         Event::fire(MadisonEvent::NEW_ACTIVITY_VOTE, array('vote_type' => 'like', 'activity' => $comment, 'user'    => Auth::user()));
-
-        return Response::json($comment->loadArray());
-    }
-
-    public function postDislikes($docId, $commentId)
-    {
-        $comment = Comment::find($commentId);
-        $comment->saveUserAction(Auth::user()->id, Comment::ACTION_DISLIKE);
-
-        //Load fields for notification
-        $comment->load('user');
-        $comment->type = 'comment';
-
-        Event::fire(MadisonEvent::NEW_ACTIVITY_VOTE, array('vote_type' => 'dislike', 'activity' => $comment, 'user'    => Auth::user()));
 
         return Response::json($comment->loadArray());
     }

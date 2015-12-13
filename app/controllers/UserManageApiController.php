@@ -44,8 +44,7 @@ class UserManageApiController extends ApiController
 
         //If the user's token field isn't blank, he/she hasn't confirmed their account via email
         if ($user->token != '') {
-            return Response::json(array( 'status' => 'error',
-                'errors' => array('Please click the link sent to your email to verify your account.'), ));
+            return Response::json($this->growlMessage('Please click the link sent to your email to verify your account.', 'error'), 401);
         }
 
         //Attempt to log user in
@@ -100,7 +99,7 @@ class UserManageApiController extends ApiController
             //Create new user
             $user = new User();
             $user->email = $email;
-            $user->password = Hash::make($password);
+            $user->password = $password;
             $user->fname = $fname;
             $user->lname = $lname;
             $user->token = $token;

@@ -15,7 +15,7 @@ class DocumentApiController extends ApiController
     {
         $doc_id = $doc;
 
-        $doc = Doc::with('content')->with('categories')->with('introtext')->find($doc);
+        $doc = Doc::with('content')->with('categories')->with('introtext')->where('is_template', '!=', '1')->find($doc);
 
         return Response::json($doc);
     }
@@ -55,7 +55,7 @@ class DocumentApiController extends ApiController
         $rules = array('title' => 'required');
         $validation = Validator::make($doc_details, $rules);
         if ($validation->fails()) {
-            return Redirect::to('dashboard/docs')->withInput()->withErrors($validation);
+            return Response::json($this->growlMessage('A valid title is required.', 'error'));
         }
 
         try {
@@ -83,6 +83,12 @@ class DocumentApiController extends ApiController
 
     public function postTitle($id)
     {
+        $rules = array('title' => 'required');
+        $validation = Validator::make(Input::only('title'), $rules);
+        if ($validation->fails()) {
+            return Response::json($this->growlMessage('A valid title is required, changes are not saved', 'error'));
+        }
+        
         $doc = Doc::find($id);
         $doc->title = Input::get('title');
         $doc->save();
@@ -164,13 +170,16 @@ class DocumentApiController extends ApiController
             $docs = Doc::getActive($limit, $offset);
         } else {
             $doc = Doc::getEager()->orderBy($order_field, $order_dir)
-                ->where('private', '!=', '1');
+                ->where('private', '!=', '1')
+                ->where('is_template', '!=', '1');
 
             if (Input::has('category')) {
                 $doc = Doc::getEager()->whereHas('categories', function ($q) {
                     $category = Input::get('category');
                     $q->where('categories.name', 'LIKE', "%$category%");
-                })->where('private', '!=', '1');
+                })
+                    ->where('private', '!=', '1')
+                    ->where('is_template', '!=', '1');
             }
 
             if (isset($limit)) {
@@ -192,15 +201,17 @@ class DocumentApiController extends ApiController
 
         $return_docs = array();
 
-        foreach ($docs as $doc) {
-            $doc->enableCounts();
+        if ($docs) {
+            foreach ($docs as $doc) {
+                $doc->enableCounts();
 
-            $return_doc = $doc->toArray();
+                $return_doc = $doc->toArray();
 
-            $return_doc['updated_at'] = date('c', strtotime($return_doc['updated_at']));
-            $return_doc['created_at'] = date('c', strtotime($return_doc['created_at']));
+                $return_doc['updated_at'] = date('c', strtotime($return_doc['updated_at']));
+                $return_doc['created_at'] = date('c', strtotime($return_doc['created_at']));
 
-            $return_docs[] = $return_doc;
+                $return_docs[] = $return_doc;
+            }
         }
 
         return Response::json($return_docs);
@@ -316,7 +327,7 @@ class DocumentApiController extends ApiController
                     $response = $group;
                     break;
                 default:
-                    throw new Exception('Unknown sponsor type '.$type);
+                    throw new Exception('Unknown sponsor type '.$sponsor['type']);
             }
         }
 

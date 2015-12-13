@@ -1,10 +1,17 @@
 /*global annotator*/
 /*global Markdown*/
 angular.module('madisonApp.controllers')
-  .controller('DocumentPageController', ['$scope', '$state', '$timeout', 'growl', '$location', '$window', 'Doc', '$sce', '$stateParams', '$http', 'loginPopupService', 'annotationService', '$anchorScroll', 'AuthService',
-    function ($scope, $state, $timeout, growl, $location, $window, Doc, $sce, $stateParams, $http, loginPopupService, annotationService, $anchorScroll, AuthService) {
+  .controller('DocumentPageController', ['$scope', '$state', '$timeout',
+      'growl', '$location', '$window', 'Doc', '$sce', '$stateParams', '$http',
+      'loginPopupService', 'annotationService', '$anchorScroll', 'AuthService',
+      '$translate', 'pageService', 'SITE',
+    function ($scope, $state, $timeout, growl, $location, $window, Doc, $sce,
+      $stateParams, $http, loginPopupService, annotationService,
+      $anchorScroll, AuthService, $translate, pageService, SITE) {
+
       $scope.annotations = [];
       $scope.activeTab = 'content';
+      $scope.doc = {};
 
       $scope.setSponsor = function () {
         try {
@@ -83,21 +90,25 @@ angular.module('madisonApp.controllers')
         // Check which tab needs to be active - if the location hash
         // is #annsubcomment or there is no hash, the annotation/bill tab needs to be active
         // Otherwise, the hash is #subcomment/#comment and the discussion tab should be active
-        var annotationHash = $location.hash().match(/^annsubcomment_([0-9]+)$/);
+        var subCommentHash = $location.hash().match(/^annsubcomment_([0-9]+)$/);
+        var annotationHash = $location.hash().match(/^annotation_([0-9]+)$/);
+
         $scope.secondtab = false;
-        if (!annotationHash && ($location.hash())) {
-          $scope.secondtab = true;
-          $scope.changeTab('comment');
+
+        // TODO: Once the hash for comments is decided, we can test for just
+        // that and go to the comment tab, otherwise stay on content.
+        if (subCommentHash || annotationHash || !$location.hash()) {
+          $scope.changeTab('content');
         }
         else {
-          $scope.changeTab('content');
+          $scope.secondtab = true;
+          $scope.changeTab('comment');
         }
       };
 
       $scope.changeTab = function (activeTab) {
         $scope.activeTab = activeTab;
       };
-
 
       $scope.attachAnnotator = function (doc, user) {
 
@@ -166,6 +177,9 @@ angular.module('madisonApp.controllers')
       //After loading the document
       $scope.doc.$promise.then(function (doc) {
 
+        pageService.setTitle($translate.instant('content.document.title',
+          {title: SITE.name, docTitle: doc.title}));
+
         $scope.setSponsor();
         $scope.getSupported();
 
@@ -175,6 +189,10 @@ angular.module('madisonApp.controllers')
         $scope.loadContent(doc).then(function () {
           $scope.attachAnnotator($scope.doc, $scope.user);
         });
+
+        if(typeof $scope.doc.comments === 'undefined') {
+          $scope.doc.comments = [];
+        }
 
         //Load introduction section from sponsor
         $scope.loadIntrotext(doc);//Load the document introduction text

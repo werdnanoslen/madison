@@ -76,8 +76,6 @@ Route::put('documents/edit/{documentId}', 'DocumentsController@saveDocumentEdits
 Route::post('documents/create', 'DocumentsController@createDocument');
 Route::post('documents/save', 'DocumentsController@saveDocument');
 Route::delete('/documents/delete/{slug}', 'DocumentsController@deleteDocument');
-Route::get('/documents/sponsor/request', 'SponsorController@getRequest');
-Route::post('/documents/sponsor/request', 'SponsorController@postRequest');
 
 //User Routes
 Route::get('user/{user}', 'UserController@getIndex');
@@ -104,11 +102,9 @@ Route::controller('dashboard', 'DashboardController');
 
     //Annotation Action Routes
     Route::post('api/docs/{doc}/annotations/{annotation}/likes', 'AnnotationApiController@postLikes');
-    Route::post('api/docs/{doc}/annotations/{annotation}/dislikes', 'AnnotationApiController@postDislikes');
     Route::post('api/docs/{doc}/annotations/{annotation}/flags', 'AnnotationApiController@postFlags');
     Route::post('api/docs/{doc}/annotations/{annotation}/seen', 'AnnotationApiController@postSeen');
     Route::get('api/docs/{doc}/annotations/{annotation}/likes', 'AnnotationApiController@getLikes');
-    Route::get('api/docs/{doc}/annotations/{annotation}/dislikes', 'AnnotationApiController@getDislikes');
     Route::get('api/docs/{doc}/annotations/{annotation}/flags', 'AnnotationApiController@getFlags');
 
     //Annotation Comment Routes
@@ -132,7 +128,6 @@ Route::controller('dashboard', 'DashboardController');
     Route::get('api/docs/{doc}/comments', 'CommentApiController@getIndex');
     Route::get('api/docs/{doc}/comments/{comment?}', 'CommentApiController@getComment');
     Route::post('api/docs/{doc}/comments/{comment}/likes', 'CommentApiController@postLikes');
-    Route::post('api/docs/{doc}/comments/{comment}/dislikes', 'CommentApiController@postDislikes');
     Route::post('api/docs/{doc}/comments/{comment}/flags', 'CommentApiController@postFlags');
     Route::post('api/docs/{doc}/comments/{comment}/comments', 'CommentApiController@postComments');
     Route::post('api/docs/{doc}/comments/{comment}/seen', 'CommentApiController@postSeen');
@@ -176,6 +171,7 @@ Route::controller('dashboard', 'DashboardController');
     Route::get('api/user/{user}', 'UserApiController@getUser');
     Route::get('api/user/verify/', 'UserApiController@getVerify');
     Route::post('api/user/verify/', 'UserApiController@postVerify');
+    Route::put('api/user/sponsor', 'SponsorApiController@putRequest');
     Route::get('api/user/admin/', 'UserApiController@getAdmins');
     Route::post('api/user/admin/', 'UserApiController@postAdmin');
     Route::get('api/user/independent/verify/', 'UserApiController@getIndependentVerify');

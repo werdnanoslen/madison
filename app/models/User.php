@@ -12,7 +12,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface
 {
     use Zizaco\Entrust\HasRole;
 
-    protected $hidden = array('password', 'token', 'last_login', 'created_at', 'updated_at', 'deleted_at', 'oauth_vendor', 'oauth_id', 'oauth_update', 'roles');
+    protected $hidden = array('password', 'token', 'last_login', 'deleted_at', 'oauth_vendor', 'oauth_id', 'oauth_update', 'roles');
     protected $appends = array('display_name');
     protected $softDelete = true;
 
@@ -355,7 +355,12 @@ class User extends Eloquent implements UserInterface, RemindableInterface
      */
     public function getSponsorStatus()
     {
-        return $this->user_meta()->where('meta_key', '=', UserMeta::TYPE_INDEPENDENT_SPONSOR)->first();
+        $result = $this->user_meta()->where('meta_key', '=', UserMeta::TYPE_INDEPENDENT_SPONSOR)->first();
+        if ($result) {
+            return (bool) $result->meta_value;
+        } else {
+            return;
+        }
     }
 
     /**
@@ -487,6 +492,37 @@ class User extends Eloquent implements UserInterface, RemindableInterface
     public static function findByRoleName($role)
     {
         return Role::where('name', '=', $role)->first()->users()->get();
+    }
+
+    /**
+     *  hasRole.
+     *
+     *  Returns a boolean if the user has the given role or not.  This overrides
+     *  the default hasRole() from Entrust.
+     *
+     *  This is just a temporary hotfix, using the Entrust Role object anywhere
+     *  is causing an uncatchable fatal error in PHP on Laravel Forge.  While we
+     *  investigate that, this will suffice in the meantime.
+     *
+     *  @param string $role
+     *
+     *  @return bool
+     */
+    public function hasRole($role)
+    {
+        $results = DB::select(
+            DB::raw('SELECT COUNT(*) AS count ' .
+                'FROM assigned_roles LEFT JOIN roles ' .
+                'ON assigned_roles.role_id = roles.id ' .
+                'WHERE assigned_roles.user_id = :userid ' .
+                'AND roles.name = :role'),
+            array('userid' => $this->id, 'role' => $role));
+
+        if ($results && isset($results[0]) && isset($results[0]->count) && $results[0]->count > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

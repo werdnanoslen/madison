@@ -19,8 +19,10 @@ class DocumentsController extends BaseController
 
         $returned = array();
 
-        $returned['raw'] = $docContent->content;
-        $returned['html'] = $docContent->html();
+        if ($docContent) {
+            $returned['raw'] = $docContent->content;
+            $returned['html'] = $docContent->html();
+        }
 
         return Response::json($returned);
     }
@@ -244,17 +246,35 @@ class DocumentsController extends BaseController
     {
         $featuredSetting = Setting::where('meta_key', '=', 'featured-doc')->first();
 
-        $doc = Doc::with('categories')->with('sponsor')->with('statuses')->with('dates');
-
         if ($featuredSetting) {
+            // Make sure our featured document can be viewed by the public.
             $featuredId = (int) $featuredSetting->meta_value;
-            $doc = $doc->where('id', $featuredId)
-                ->where('private', '!=', '1')->first();
-        } else {
-            $doc = $doc->orderBy('created_at', 'desc')
-                ->where('private', '!=', '1')->first();
-            $doc->thumbnail = '/img/default/default.jpg';
+            $doc = Doc::with('categories')->with('sponsor')->with('statuses')
+                ->with('dates')
+                ->where('id', $featuredId)
+                ->where('private', '!=', '1')
+                ->where('is_template', '!=', '1')
+                ->first();
         }
+
+        // If we don't have a document, just find anything recent.
+        if (empty($doc)) {
+            $doc = Doc::with('categories')->with('sponsor')->with('statuses')
+                ->with('dates')
+                ->where('private', '!=', '1')
+                ->where('is_template', '!=', '1')
+                ->orderBy('created_at', 'desc')
+                ->first();
+            if (!empty($doc)) {
+                $doc->thumbnail = '/img/default/default.jpg';
+            }
+        }
+
+        // If we still don't have a document, give up.
+        if (empty($doc)) {
+            return Response::make(null, 404);
+        }
+
         $doc->enableCounts();
 
         $return_doc = $doc->toArray();

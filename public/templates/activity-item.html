@@ -1,3 +1,5 @@
+<!-- Is this still being used? -->
+
 <div class="col-md-12">
     <div class="row">
         <div class="activity-author col-md-8">
@@ -25,7 +27,6 @@
         </div>
         <div class="col-md-8 activity-actions">
             <span class="glyphicon glyphicon-thumbs-up" ng-click="addAction(activity, 'likes', $event)">({{ activity.likes || '0' }})</span>
-            <span class="glyphicon glyphicon-thumbs-down" ng-click="addAction(activity, 'dislikes', $event)">({{ activity.dislikes || '0' }})</span>
             <span class="glyphicon glyphicon-flag" ng-click="addAction(activity, 'flags', $event)">({{ activity.flags || '0' }})</span>
         </div>
     </div>
@@ -56,7 +57,6 @@
         </div>
         <div class="col-md-7 activity-actions">
             <span class="glyphicon glyphicon-thumbs-up" ng-click="addAction(comment, 'likes', $event)">({{ comment.likes || '0' }})</span>
-            <span class="glyphicon glyphicon-thumbs-down" ng-click="addAction(comment, 'dislikes', $event)">({{ comment.dislikes || '0' }})</span>
             <span class="glyphicon glyphicon-flag" ng-click="addAction(comment, 'flags', $event)">({{ comment.flags || '0' }})</span>
         </div>
     </div>
@@ -79,7 +79,7 @@
             <form name="add-subcomment-form" ng-submit="subcommentSubmit(activity, subcomment)">
                 <input ng-model="subcomment.text" type="text" class="form-control centered" placeholder="Add a comment" required />
             </form>
-        </div>        
+        </div>
         <div id="subcomment_{{ comment.id }}" class="activity-reply col-md-12" ng-repeat="comment in activity.comments" ng-include="'subcomment_renderer.html'">
             <div sub-comment-id="{{ comment.id }}"></div>
         </div>

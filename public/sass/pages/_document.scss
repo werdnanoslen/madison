@@ -263,6 +263,16 @@
     .content {
         padding: (.5 * $line-height-computed) 25px;
     }
+
+    &.highlight {
+        background-color: lighten($yellow, 30%);
+    }
+}
+
+.comment-body {
+    &.highlight {
+        background-color: lighten($yellow, 30%);
+    }
 }
 
 .toggle-replies {
@@ -387,7 +397,7 @@ $fallback-height: 350px;
         width: 150px;
         // And a little offset from the top.
         margin-top: 20px;
-        span {
+        .toc-title-side {
             @extend .small-caps;
             font-weight: bold;
             display: inline-block;
